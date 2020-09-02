@@ -12,3 +12,15 @@ Myles Roddy(Mar744-dev)
 github username: clockwork85 https://github.com/clockwork85
 
 Matthew Bray is a graduate student in the Computational Engineering program.  
+
+
+
+
+
+
+
+
+<h3>Raysita Maharani</h3>
+github username : Raysitaaas https://github.com/Raysitaaas
+
+Raysita Maharani is an undergraduate student majoring in Software Engineering.
