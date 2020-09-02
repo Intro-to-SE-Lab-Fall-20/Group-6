@@ -4,8 +4,6 @@ Repository for Email Client Project called SEECEMAIL
 <h2>Group 6 Members</h2>
 Justin Paulk (CognizantPotato)
 
-Raysita Maharani(Raysitaaas)
-
 Myles Roddy(Mar744-dev)
 
 <h3>Matthew Bray</h3>
