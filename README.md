@@ -1,8 +1,15 @@
-# Group-6
-Repository for Email Client Project called SEECMAIL
+# Group-6 Software Engineering Project
+Repository for Email Client Project called SEECEMAIL
+<h2>Features</h2>
+- Users will be able to login with a unique username and password
+- Users will be able send and receive emails
+- Users will be able to view, search, and forward emails
+- Users will be able to send file attachments with their emails
 
 <h2>Objective</h2>
 To create a functional web-application that can open, search, compose, attach files, and send an email.
+
+<h2>Description of Project</h2>
 
 <h2>Group 6 Members</h2>
 
