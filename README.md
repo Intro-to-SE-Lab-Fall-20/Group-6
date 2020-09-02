@@ -2,8 +2,6 @@
 Repository for Email Client Project called SEECEMAIL
 
 <h2>Group 6 Members</h2>
-Justin Paulk (CognizantPotato)
-
 Myles Roddy(Mar744-dev)
 
 <h3>Matthew Bray</h3>
@@ -22,3 +20,14 @@ Matthew Bray is a graduate student in the Computational Engineering program.
 github username : Raysitaaas https://github.com/Raysitaaas
 
 Raysita Maharani is an undergraduate student majoring in Software Engineering.
+
+
+
+
+
+
+
+<h3>Justin Paulk</h3>
+github username: CognizantPotato https://github.com/CognizantPotato
+
+Justin paulk is an undergraduate student majoring in Software Engineering.
