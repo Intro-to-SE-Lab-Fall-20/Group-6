@@ -1,5 +1,5 @@
 # Group-6
-Repository for Email Client Project called SEECEMAIL
+Repository for Email Client Project called SEECMAIL
 
 <h2>Objective</h2>
 To create a functional web-application that can open, search, compose, attach files, and send an email.
