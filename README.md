@@ -1,5 +1,5 @@
 # Group-6
-Repository for Email Client called SEECEMAIL
+Repository for Email Client Project called SEECEMAIL
 
 <h2>Group 6 Members</h2>
 Justin Paulk (CognizantPotato)
