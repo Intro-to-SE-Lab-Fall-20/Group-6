@@ -1,5 +1,5 @@
 # Group-6
-Repository for Email Client Project called SEECEMAIL
+Repository for Email Client Project called SEECMAIL
 
 <h2>Group 6 Members</h2>
 Myles Roddy(Mar744-dev)
