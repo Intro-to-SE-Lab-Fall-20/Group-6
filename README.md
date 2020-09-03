@@ -1,5 +1,5 @@
 # Group-6 Software Engineering Project
-Repository for Email Client Project called SEECEMAIL
+Repository for Email Client Project called SEECMAIL
 <h2>Features</h2>
   <li>Users will be able to login with a unique username and password</li>
   <li>Users will be able send and receive emails</li>
