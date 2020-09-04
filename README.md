@@ -12,6 +12,9 @@ To create a functional web-application that can open, search, compose, attach fi
 <h2>Description of Project</h2>
 This web-application will allow users to log in to their account with a username and password.  After logging into their account they will be presented with their homepage.  From this homepage the user will also be able to view and access previous emails, search through their emails, forward a previous email message, and compose a new email message.  The users will also have the capability to include a file attachment with their email messages.
 
+<h2>Languages and Frameworks</h2>
+Python, Flask, SQLite3, HTML, CSS 
+
 <h2>Group 6 Members</h2>
 
 <h3>Matthew Bray</h3>
