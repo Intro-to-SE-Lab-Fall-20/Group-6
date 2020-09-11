@@ -1,0 +1,214 @@
+@import
+url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@500&display=swap');
+
+* {
+  box-sizing:border-box;
+}
+
+header {
+  position: absolute;
+  left: 0;
+  right:0;
+
+}
+
+nav ul {
+margin: 0;
+padding: 0;
+list-style: none;
+}
+
+nav li {
+  display: inline-block;
+  margin: 1em;
+  text-align: right;
+}
+
+nav a {
+  font-weight: 500;
+  text-decoration: none;
+  font-size: 1.2em;
+  padding: .5em;
+  color: white;
+  text-align: right;
+}
+nav {
+  float: right;
+  padding: 5em 2.5em 0 0;
+}
+nav h1 {
+  text-align: center;
+}
+nav a:hover{
+  color: #DDD;
+}
+
+body {
+  margin: 0;
+  font-family: 'Rajdhani', sans-serif;
+}
+img {
+  max-width:50%;
+  height: auto;
+}
+
+.logo {
+  padding-left: 1.9em;
+  padding-top: 4em;
+}
+
+.title {
+font-size: 2.5rem;
+margin-bottom: 1.5em;
+font-weight: 700;
+margin-top: 1.1em;
+}
+
+
+.index-container {
+  width: 95%;
+  margin: 0 auto;
+  padding: 11em 0 0 0;
+}
+
+h1 {
+  text-align:center;
+  color: white;
+}
+
+.mainscreen {
+  background-image: url(image1.JPEG);
+  background-size: cover;
+  background-position: center;
+  padding: 10em 0;
+  height:100vh;
+}
+
+.button {
+  display: inline-block;
+  font-size: 1.7em;
+  color: #FFF;
+  text-decoration: none;
+  border-width: 1px;
+  border-style: solid;
+  padding: .5em 1.5em;
+  margin-left: 29.8em;
+  margin-top: -2em;
+}
+
+.button-accent {
+  color: white;
+  border-color: white;
+}
+
+.button-accent:hover,
+.button-accent:focus {
+  background: white;
+  color: gray;
+}
+
+.container1 {
+  width: 95%;
+  margin: 0 auto;
+  padding: 4em 0 0 0;
+  text-align:center;
+  color: white;
+}
+
+
+.textbox-base {
+padding-left: 5em;
+padding-top: -3em;
+}
+
+.textbox {
+  background: rgba(0,0,0,.5);
+  padding: 4em;
+  outline: 2px solid white;
+  outline-offset: -2.5em;
+  position:relative;
+  color: white;
+  text-align: center;
+  width: 30%;
+  box-shadow: 0 0 4em 0 rgba(0,0,0.3);
+}
+
+.textbox h1 {
+  font-size: 32px;
+  margin-top: .3em;
+  left: 3.5rem;
+
+}
+
+.textbox p {
+  font-size: 25px;
+}
+
+/* emailform */
+main {
+  height: 100vh;
+  background-image: url(image.JPEG);
+  background-size: cover;
+  background-position: center;
+  margin-top: -3em;
+}
+
+.emailtitle {
+  padding-top: 16vh;
+  margin-bottom: 10px;
+  text-align: center;
+  text-transform: uppercase;
+  font-size: 3em;
+  color: white;
+}
+
+.listemailform {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  margin-top: -15.2em;
+}
+
+.listemailform1 {
+  display: inline-block;
+  margin: 1em;
+  text-align: right;
+  color: white;
+  font-weight: 500;
+  text-decoration: none;
+  font-size: 1.2em;
+  padding: .5em;
+}
+
+.contact-form {
+  margin-left: 29em;
+  padding-top: 3em;
+  display: flex;
+  flex-flow: row wrap;
+  align-items: center;
+}
+
+.contact-form input {
+  margin: 5px 10px 5px 0;
+  vertical-align:text-bottom;
+  padding: 10px;
+  border: 1px solid #ddd;
+}
+
+.contact-form button {
+  padding: 10px 20px;
+  background-color: dodgerblue;
+  border: 1px solid #ddd;
+  color: white;
+}
+
+.contact-form textarea {
+  vertical-align:text-top;
+  margin: 9px 10px 5px 0;
+  padding-top: .9em;
+  padding-left: .9em;
+  border: 1px solid #ddd;
+  width : 25%;
+  height: 40%;
+  margin-top: 6px;
+}
