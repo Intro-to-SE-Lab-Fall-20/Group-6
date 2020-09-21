@@ -3,7 +3,6 @@
 from flask import Flask, redirect, url_for, render_template, request, session, flash
 from datetime import timedelta
 from flask_sqlalchemy import SQLAlchemy
-#from second import second
 
 app = Flask(__name__)
 app.secret_key = "testing"
@@ -44,14 +43,25 @@ def login():
         session["password"] = password
         # Look for user in the database
         # This will be where we do authentication 
-#        found_user = Users.query.filter_by(email=email).first()
-#        print(f"Found user: {found_user}")
-#        if found_user: 
-#            session["email"] = found_user.email
-#        else:
-#            usr = Users(email) #, "random_pass")
-#            db.session.add(usr)
+        found_user = Users.query.filter_by(email=email).first()
+        
+        if found_user: 
+            session["email"] = found_user.email
+            if password != found_user.password: 
+                flash("You have entered the wrong password!")
+                return render_template("login.html")
+            else:
+                # This is for debugging - this can't be good practice
+                session["password"] = password
+        else:
+            flash("Username not found in database")
+            return render_template("login.html")
+
+            # Maybe a way to let initial Users "sign up" with their first log in
+#            new_user = Users(email, whatever_password)
+#            db.session.add(new_user)
 #            db.session.commit()
+
 
         flash("Login successful!")
         return redirect(url_for("user"))
@@ -63,7 +73,6 @@ def user():
     email = None
     if "email" in session:
         user = session["email"]
-#        return f"<h1>{user}'s email messages (that don't exist)"
         return render_template("user.html", user=user)
     else:
         flash("You are not logged in!")
@@ -82,9 +91,16 @@ def logout():
         flash(f"You are not logged in yet")
         return redirect(url_for("login"))
 
+def setup_database(db):
+    admin = Users(email="admin@email.com", password="secret")
+    user = Users(email="user@email.com", password="supersecret")
+    db.session.add(admin)
+    db.session.add(user)
+    db.session.commit()
 
 if __name__ == "__main__":
     db.create_all()
+    setup_database(db)
     app.run(debug=True)
 
 
