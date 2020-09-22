@@ -27,10 +27,9 @@ class Users(db.Model):
 def home():
     return render_template("index.html")
 
-# This is a good example of a way to debug things in Flask - dump it to a temporary page
-#@app.route("/view")
-#def view():
-#    return render_template("view.html", values=Users.query.all())
+@app.route("/view")
+def view():
+    return render_template("view.html", values=Users.query.all())
 
 @app.route("/login", methods=["POST", "GET"])
 def login():
@@ -96,17 +95,25 @@ def logout():
         flash(f"You are not logged in yet")
         return redirect(url_for("login"))
 
+def reset_database(db):
+    db.drop_all()
+
 def setup_database(db):
     admin = Users(email="admin@email.com", password="secret")
+    found_user = Users.query.filter_by(email=admin.email).first()
+    if not found_user:
+        db.session.add(admin)
     user = Users(email="user@email.com", password="supersecret")
-    db.session.add(admin)
-    db.session.add(user)
+    found_user = Users.query.filter_by(email=user.email).first()
+    if not found_user:
+        db.session.add(user)
     db.session.commit()
 
 if __name__ == "__main__":
     db.create_all()
     setup_database(db)
     app.run(debug=True)
+    reset_database(db)
 
 
 
