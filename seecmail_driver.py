@@ -35,38 +35,43 @@ def home():
 @app.route("/login", methods=["POST", "GET"])
 def login():
     if request.method == "POST":
-        session.permanent = True
-        # Grab the data from the boxes after you hit login
-        email = request.form["user_email"] # This variable from login.html
-        session["email"] = email  
-        password = request.form["user_password"]  # This variable from login.html
-        session["password"] = password
-        # Look for user in the database
-        # This will be where we do authentication 
-        found_user = Users.query.filter_by(email=email).first()
-        
-        if found_user: 
-            session["email"] = found_user.email
-            if password != found_user.password: 
-                flash("You have entered the wrong password!")
-                return render_template("login.html")
+        # if they press the login button
+        if 'login_button' in request.form:
+            session.permanent = True
+            # Grab the data from the boxes after you hit login
+            email = request.form["user_email"] # This variable from login.html
+            session["email"] = email  
+            password = request.form["user_password"]  # This variable from login.html
+            session["password"] = password
+            # Look for user in the database
+            # This will be where we do authentication 
+            found_user = Users.query.filter_by(email=email).first()
+
+            if found_user: 
+                session["email"] = found_user.email
+                if password != found_user.password: 
+                    flash("You have entered the wrong password!")
+                    return render_template("login.html")
+                else:
+                    # This is for debugging - this can't be good practice
+                    session["password"] = password
             else:
-                # This is for debugging - this can't be good practice
-                session["password"] = password
-        else:
-            flash("Username not found in database")
+                flash("Username not found in database")
+                return render_template("login.html")
+
+            flash("Login successful!")
+            return redirect(url_for("user"))
+        elif 'register_button' in request.form:
+            email = request.form["user_email"]
+            password = request.form["user_password"]
+            new_user = Users(email, password)
+            db.session.add(new_user)
+            db.session.commit()
+            flash("You have been registered.  You may now login with credentials")
             return render_template("login.html")
-
-            # Maybe a way to let initial Users "sign up" with their first log in
-#            new_user = Users(email, whatever_password)
-#            db.session.add(new_user)
-#            db.session.commit()
-
-
-        flash("Login successful!")
-        return redirect(url_for("user"))
     else:
         return render_template("login.html")
+
 
 @app.route("/user", methods=["POST", "GET"])
 def user():
