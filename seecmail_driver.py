@@ -3,6 +3,7 @@
 from flask import Flask, redirect, url_for, render_template, request, session, flash
 from datetime import timedelta
 from flask_sqlalchemy import SQLAlchemy
+import getpass
 
 app = Flask(__name__)
 app.secret_key = "testing"
@@ -60,10 +61,15 @@ def login():
 
             flash("Login successful!")
             return redirect(url_for("user"))
+        # They have pressed the Register button
         elif 'register_button' in request.form:
             email = request.form["user_email"]
             password = request.form["user_password"]
             new_user = Users(email, password)
+            found_user = Users.query.filter_by(email=email).first()
+            if found_user:
+                flash("This user is already registered.  Please login or register a new user.")
+                return render_template("login.html")
             db.session.add(new_user)
             db.session.commit()
             flash("You have been registered.  You may now login with credentials")
