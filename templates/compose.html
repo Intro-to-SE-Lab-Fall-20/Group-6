@@ -1,0 +1,14 @@
+{% extends "base.html" %} 
+{% block title %}Compose Email{% endblock %}
+{% block content %}
+<form action="#" method="post">
+    <p>Message To:</p>
+    <p><input type="email" name="email_to" placeholder="Email Recipient" style="width: 400px;"/> </p>
+    <p>Subject:</p>
+    <p><input type="text" name="email_subject" placeholder="Email Subject" style="width: 400px;"/> </p>
+    <p>Message Body:</p>
+    <p><input type="text" name="email_body" placeholder="Enter Your Message" style="width: 800px; height: 200px;"/> </p>
+    <p><input type="submit" name="send_email" value="Send Email" /> </p>
+</form>
+{% endblock %}
+
