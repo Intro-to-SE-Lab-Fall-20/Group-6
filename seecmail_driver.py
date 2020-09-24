@@ -32,6 +32,28 @@ def home():
 def view():
     return render_template("view.html", values=Users.query.all())
 
+@app.route("/compose", methods=["POST", "GET"])
+def compose():
+    # If they are hitting the send button
+    if not "email" in session:
+        flash("You are not logged in.")
+        return redirect(url_for("login"))
+
+    if request.method == "POST":
+        recipient = request.form["email_to"]
+        subject = request.form["email_subject"]
+        body = request.form["email_body"]
+
+        print(f"Recipient: {recipient}")
+        print(f"Subject: {subject}")
+        print(f"Body of message: {body}")
+
+
+        return redirect(url_for("user"))
+
+    else:
+        return render_template("compose.html")
+
 @app.route("/login", methods=["POST", "GET"])
 def login():
     if request.method == "POST":
