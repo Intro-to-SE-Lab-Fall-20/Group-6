@@ -1,9 +1,12 @@
 #!/usr/bin/env python
 
+from email.message import EmailMessage
 from flask import Flask, redirect, url_for, render_template, request, session, flash
 from datetime import timedelta
 from flask_sqlalchemy import SQLAlchemy
 import getpass
+#import imghdr # for images later
+import smtplib
 
 app = Flask(__name__)
 app.secret_key = "testing"
@@ -38,17 +41,22 @@ def compose():
     if not "email" in session:
         flash("You are not logged in.")
         return redirect(url_for("login"))
+    # For debugging
+    print(session["email"])
 
     if request.method == "POST":
-        recipient = request.form["email_to"]
-        subject = request.form["email_subject"]
-        body = request.form["email_body"]
+        msg = EmailMessage()
+        msg["From"] = session["email"]
+        msg["To"]= request.form["email_to"]
+        msg["Subject"]= request.form["email_subject"]
+        msg.set_content(request.form["email_body"])
 
-        print(f"Recipient: {recipient}")
-        print(f"Subject: {subject}")
-        print(f"Body of message: {body}")
+        with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp:
+            smtp.login(session["email"], session["password"])
+            smtp.send_message(msg)
 
 
+        flash("Message sent")
         return redirect(url_for("user"))
 
     else:
