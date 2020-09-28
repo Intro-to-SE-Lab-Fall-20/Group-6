@@ -53,6 +53,7 @@ def compose():
 
         with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp:
             smtp.login(session["email"], session["password"])
+            msg.set_type('text/html')
             smtp.send_message(msg)
 
 
