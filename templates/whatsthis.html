@@ -4,8 +4,10 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width-device-width, initial=scale=1">
     <link rel="stylesheet" href="{{ url_for('static',filename='style.css') }}">
-    <title>SEECEMAIL</title>
+    <title>About</title>
   </head>
+
+
   <body>
     <header>
       <div>
@@ -15,18 +17,20 @@
         <nav>
           <ul>
             <li><a href="{{ url_for('home')}}">Home</a></li>
-            <li><a href="login.html">Log in</a></li>
-            <li><a href="{{ url_for('logout') }}">Log out</a></li>
           </ul>
         </nav>
       </div>
     </header>
 
 <section class="mainscreen">
-  <div class="index-container">
-    <h1 class="title">EMAIL CLIENT PROJECT</h1>
-    <a href="{{ url_for('whatsthis') }}" class="button button-accent">what's this?</a>
+  <div class="container1">
+    <h1 class="title">Email Client Project</h1>
+    <section class="textbox-base">
+        <div class="textbox">
+          <h1>about us</h1>
+            <p>We are students from Intro to Software Engineering class working on an Email Client Project. This project will be completed throughout this Fall Semester by Justin Paulk, Matthew, Myles Roddy, and Raysita</p>
+        </div>
   </div>
 </section>
-  </body>
+</body>
 </html>
