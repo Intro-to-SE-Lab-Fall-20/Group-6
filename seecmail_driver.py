@@ -4,6 +4,8 @@ from email.message import EmailMessage
 from flask import Flask, redirect, url_for, render_template, request, session, flash
 from datetime import timedelta
 from flask_sqlalchemy import SQLAlchemy
+from flask import session
+
 import getpass
 #import imghdr # for images later
 import smtplib
@@ -35,35 +37,9 @@ def home():
 def view():
     return render_template("view.html", values=Users.query.all())
 
-@app.route("/compose", methods=["POST", "GET"])
-def compose():
-    # If they are hitting the send button
-    if not "email" in session:
-        flash("You are not logged in.")
-        return redirect(url_for("login"))
-    # For debugging
-    print(session["email"])
-
-    if request.method == "POST":
-        msg = EmailMessage()
-        msg["From"] = session["email"]
-        msg["To"]= request.form["email_to"]
-        msg["Subject"]= request.form["email_subject"]
-        msg.set_content(request.form["email_body"])
-
-        with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp:
-            smtp.login(session["email"], session["password"])
-            msg.set_type('text/html')
-            smtp.send_message(msg)
 
 
-        flash("Message sent")
-        return redirect(url_for("user"))
-
-    else:
-        return render_template("compose.html")
-
-@app.route("/login", methods=["POST", "GET"])
+@app.route("/login.html", methods=["POST", "GET"])
 def login():
     if request.method == "POST":
         # if they press the login button
@@ -71,23 +47,23 @@ def login():
             session.permanent = True
             # Grab the data from the boxes after you hit login
             email = request.form["user_email"] # This variable from login.html
-            session["email"] = email  
+            session["email"] = email
             password = request.form["user_password"]  # This variable from login.html
             session["password"] = password
             # Look for user in the database
-            # This will be where we do authentication 
+            # This will be where we do authentication
             found_user = Users.query.filter_by(email=email).first()
 
-            if found_user: 
+            if found_user:
                 session["email"] = found_user.email
-                if password != found_user.password: 
+                if password != found_user.password:
                     flash("You have entered the wrong password!")
                     return render_template("login.html")
                 else:
                     # This is for debugging - this can't be good practice
                     session["password"] = password
             else:
-                flash("Username not found in database")
+                flash('Username not found in database')
                 return render_template("login.html")
 
             flash("Login successful!")
@@ -99,28 +75,57 @@ def login():
             new_user = Users(email, password)
             found_user = Users.query.filter_by(email=email).first()
             if found_user:
-                flash("This user is already registered.  Please login or register a new user.")
+                flash("This user is already registered.  Please login or register a new user.", 'error')
                 return render_template("login.html")
             db.session.add(new_user)
             db.session.commit()
-            flash("You have been registered.  You may now login with credentials")
+            flash("You have been registered.  You may now login with credentials", 'error')
             return render_template("login.html")
     else:
         return render_template("login.html")
 
 
-@app.route("/user", methods=["POST", "GET"])
+@app.route("/user.html", methods=["POST", "GET"])
 def user():
+
     email = None
     if "email" in session:
         user = session["email"]
-        return render_template("user.html", user=user)
+        return render_template(url_for("user"))
     else:
         flash("You are not logged in!")
         return redirect(url_for("login"))
 
+    # For debugging
+    print(session["email"])
+    # if not "email" in session:
+    #     flash("You are not logged in.")
+    #     return redirect(url_for("login"))
+
+
+@app.route("/compose", methods=["POST", "GET"])
+def compose():
+    if request.method == "POST":
+        msg = EmailMessage()
+        msg["From"] = session["email"]
+        msg["To"] = request.form["email_to"]
+        msg["Subject"] = request.form["email_subject"]
+        msg.set_content(request.form["email_body"])
+
+        with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp:
+            smtp.login(session["email"], session["password"])
+            msg.set_type('text/html')
+            smtp.send_message(msg)
+
+        flash("Message sent")
+        return redirect(url_for("compose"))
+
+    else:
+        return render_template("compose.html")
+
 @app.route("/logout")
 def logout():
+
     if "email" in session:
         user = session["email"]
         flash(f"You have been logged out, {user}!", "info")
@@ -129,8 +134,12 @@ def logout():
         return redirect(url_for("login"))
     else:
         flash(f"session: {session}")
-        flash(f"You are not logged in yet")
+        flash(f"You are not logged in")
         return redirect(url_for("login"))
+
+@app.route("/whatsthis")
+def whatsthis():
+    return render_template('whatsthis.html')
 
 def reset_database(db):
     db.drop_all()
@@ -140,7 +149,7 @@ def setup_database(db):
     found_user = Users.query.filter_by(email=admin.email).first()
     if not found_user:
         db.session.add(admin)
-    user = Users(email="user@email.com", password="supersecret")
+    user = Users(email="group6dummy@gmail.com", password="supersecret")
     found_user = Users.query.filter_by(email=user.email).first()
     if not found_user:
         db.session.add(user)
