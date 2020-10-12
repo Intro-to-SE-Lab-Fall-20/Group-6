@@ -3,7 +3,7 @@
 from email.message import EmailMessage
 import email
 from flask import Flask, redirect, url_for, render_template, request, session, flash
-from datetime import timedelta
+from datetime import timedelta, datetime
 #import imghdr # for images later
 import smtplib
 import imaplib
@@ -28,14 +28,19 @@ def get_inbox():
 
         email_message = email.message_from_bytes(b)
         # Grabbing and formatting the data that we want to display
-        for header in ['subject', 'to', 'from', 'date']:
+        for header in ['subject', 'to', 'from']: # , 'date']:
             email_data[header] = email_message[header]
+        # Convert to datetime format for descending order
+        time_fmt = " ".join(email_message['date'].split()[:5])
+        dt = datetime.strptime(time_fmt, '%a, %d %b %Y %H:%M:%S')
+        email_data['date'] = dt
         for part in email_message.walk():
             if part.get_content_type() == "text/plain":
                 email_data['body'] = part.get_payload(decode=True).decode()
             elif part.get_content_type() == "text/html":
                 email_data['html_body'] = part.get_payload(decode=True).decode()
         my_message.append(email_data)
+    my_message.sort(key=lambda d: d['date'], reverse=True) # Reverse order, newest first
     return my_message
 
 @app.route("/")
