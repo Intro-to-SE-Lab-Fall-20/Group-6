@@ -76,86 +76,17 @@
 						
 						<div class="table-responsive">
 							<table class="table">
-								<tbody><tr>
+								<tbody>
+                                {% for message in inbox %}
+                                <tr>
 									<td class="action"><input type="checkbox" /></td>
-									<td class="action"><i class="fa fa-star-o"></i></td>
-									<td class="action"><i class="fa fa-bookmark-o"></i></td>
-									<td class="name"><a href="#">Larry Gardner</a></td>
-									<td class="subject"><a href="#">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed </a></td>
-									<td class="time">08:30 PM</td>
+									<!-- <td class="action"><i class="fa fa-star-o"></i></td>
+                                    <td class="action"><i class="fa fa-bookmark-o"></i></td> --> 
+                                    <td class="name"><a href="#">{{message['from']}}</a></td>
+                                    <td class="subject"><a href="#">{{message['subject']}}</a></td>
+                                    <td class="time">{{message['date']}}</td>
 								</tr>
-								<tr>
-									<td class="action"><input type="checkbox" /></td>
-									<td class="action"><i class="fa fa-star-o"></i></td>
-									<td class="action"><i class="fa fa-bookmark"></i></td>
-									<td class="name"><a href="#">Larry Gardner</a></td>
-									<td class="subject"><a href="#">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed </a></td>
-									<td class="time">08:30 PM</td>
-								</tr>
-								<tr class="read">
-									<td class="action"><div class="icheckbox_square-blue" st<td class="action"><input type="checkbox" /></td>
-									<td class="action"><i class="fa fa-star"></i></td>
-									<td class="action"><i class="fa fa-bookmark"></i></td>
-									<td class="name"><a href="#">Larry Gardner</a></td>
-									<td class="subject"><a href="#">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed </a></td>
-									<td class="time">08:30 PM</td>
-								</tr>
-								<tr>
-									<td class="action"><input type="checkbox" /></td>
-									<td class="action"><i class="fa fa-star-o"></i></td>
-									<td class="action"><i class="fa fa-bookmark-o"></i></td>
-									<td class="name"><a href="#">Larry Gardner</a></td>
-									<td class="subject"><a href="#">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed </a></td>
-									<td class="time">08:30 PM</td>
-								</tr>
-								<tr class="read">
-									<td class="action"><input type="checkbox" /></td>
-									<td class="action"><i class="fa fa-star-o"></i></td>
-									<td class="action"><i class="fa fa-bookmark-o"></i></td>
-									<td class="name"><a href="#">Larry Gardner</a></td>
-									<td class="subject"><a href="#">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed </a></td>
-									<td class="time">08:30 PM</td>
-								</tr>
-								<tr class="read">
-                                    <td class="action"><input type="checkbox" /></td>
-									<td class="action"><i class="fa fa-star-o"></i></td>
-									<td class="action"><i class="fa fa-bookmark"></i></td>
-									<td class="name"><a href="#">Larry Gardner</a></td>
-									<td class="subject"><a href="#">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed </a></td>
-									<td class="time">08:30 PM</td>
-								</tr>
-								<tr>
-                                    <td class="action"><input type="checkbox" /></td>
-									<td class="action"><i class="fa fa-star"></i></td>
-									<td class="action"><i class="fa fa-bookmark-o"></i></td>
-									<td class="name"><a href="#">Larry Gardner</a></td>
-									<td class="subject"><a href="#">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed </a></td>
-									<td class="time">08:30 PM</td>
-								</tr>
-								<tr>
-									<td class="action"><input type="checkbox" /></td>
-									<td class="action"><i class="fa fa-star-o"></i></td>
-									<td class="action"><i class="fa fa-bookmark-o"></i></td>
-									<td class="name"><a href="#">Larry Gardner</a></td>
-									<td class="subject"><a href="#">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed </a></td>
-									<td class="time">08:30 PM</td>
-								</tr>
-								<tr class="read">
-									<td class="action"><input type="checkbox" /></td>
-									<td class="action"><i class="fa fa-star"></i></td>
-									<td class="action"><i class="fa fa-bookmark"></i></td>
-									<td class="name"><a href="#">Larry Gardner</a></td>
-									<td class="subject"><a href="#">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed </a></td>
-									<td class="time">08:30 PM</td>
-								</tr>
-								<tr>
-									<td class="action"><input type="checkbox" /></td>
-									<td class="action"><i class="fa fa-star"></i></td>
-									<td class="action"><i class="fa fa-bookmark-o"></i></td>
-									<td class="name"><a href="#">Larry Gardner</a></td>
-									<td class="subject"><a href="#">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed </a></td>
-									<td class="time">08:30 PM</td>
-								</tr>
+                                {% endfor %}
 							</tbody></table>
 						</div>
 
