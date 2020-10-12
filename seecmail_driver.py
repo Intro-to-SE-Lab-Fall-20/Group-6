@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 from email.message import EmailMessage
+import email
 from flask import Flask, redirect, url_for, render_template, request, session, flash
 from datetime import timedelta
 #import imghdr # for images later
@@ -11,9 +12,31 @@ app = Flask(__name__)
 app.secret_key = "testing"
 
 
-def get_inbox(host): 
+def get_inbox(): 
+    host = 'imap.gmail.com'
     mail = imaplib.IMAP4_SSL(host)
     mail.login(session["email"], session["password"])
+    mail.select("inbox")
+    _, search_data = mail.search(None, "ALL")
+    my_message = []
+    for num in search_data[0].split():
+        email_data = {}
+        # These codes are documented here:
+        # https://tools.ietf.org/html/rfc3501
+        _, data = mail.fetch(num, '(RFC822)')
+        _, b = data[0]
+
+        email_message = email.message_from_bytes(b)
+        # Grabbing and formatting the data that we want to display
+        for header in ['subject', 'to', 'from', 'date']:
+            email_data[header] = email_message[header]
+        for part in email_message.walk():
+            if part.get_content_type() == "text/plain":
+                email_data['body'] = part.get_payload(decode=True).decode()
+            elif part.get_content_type() == "text/html":
+                email_data['html_body'] = part.get_payload(decode=True).decode()
+        my_message.append(email_data)
+    return my_message
 
 @app.route("/")
 @app.route("/home")
@@ -86,7 +109,8 @@ def user():
     if "email" in session:
         user = session["email"]
         password = session["password"]
-        return render_template("user.html", user=user)
+        inbox = get_inbox()
+        return render_template("user.html", inbox=inbox, user=user)
     else:
         flash("You are not logged in!")
         return redirect(url_for("login"))
