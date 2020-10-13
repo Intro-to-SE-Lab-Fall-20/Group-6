@@ -4,12 +4,16 @@ from email.message import EmailMessage
 import email
 from flask import Flask, redirect, url_for, render_template, request, session, flash
 from datetime import timedelta, datetime
-#import imghdr # for images later
+import imghdr # for images 
+import os 
 import smtplib
 import imaplib
+from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
 app.secret_key = "testing"
+# Stop from allowing huge uploads
+app.config['MAX_CONTENT_LENGTH'] = 1024 * 1024  
 
 # Default folder is the inbox
 def get_inbox(folder="INBOX"): 
@@ -64,9 +68,29 @@ def compose():
         msg["Subject"]= request.form["email_subject"]
         msg.set_content(request.form["email_body"])
 
+        print(f"Message: {msg}")
+        #print(f"TEST: {request.files['attachment']}")
+        upload = request.files['attachment']
+        
+        # Uploading file to our assets directory
+        if upload.filename != '':
+            filename = secure_filename(upload.filename)
+            assets_dir = os.path.join(os.getcwd(), 'uploads')
+            # print(f"Assets: {assets_dir}")
+            upload.save( os.path.join('uploads',filename) )
+            # Read the file data
+            with open(os.path.join(assets_dir, upload.filename), 'rb') as f:
+                file_data = f.read()
+                file_type = imghdr.what(f.name)
+                file_name = f.name
+            msg.add_attachment(file_data, maintype='image', subtype=file_type,
+                               filename=file_name)
+            flash("File uploaded")
+
+
         with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp:
             smtp.login(session["email"], session["password"])
-            msg.set_type('text/html')
+            #msg.set_type('text/html')
             smtp.send_message(msg)
 
 
