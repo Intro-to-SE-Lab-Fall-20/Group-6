@@ -11,12 +11,12 @@ import imaplib
 app = Flask(__name__)
 app.secret_key = "testing"
 
-
-def get_inbox(): 
+# Default folder is the inbox
+def get_inbox(folder="INBOX"): 
     host = 'imap.gmail.com'
     mail = imaplib.IMAP4_SSL(host)
     mail.login(session["email"], session["password"])
-    mail.select("inbox")
+    mail.select(folder)
     _, search_data = mail.search(None, "ALL")
     my_message = []
     for num in search_data[0].split():
@@ -115,6 +115,17 @@ def user():
         user = session["email"]
         password = session["password"]
         inbox = get_inbox()
+        return render_template("user.html", inbox=inbox, user=user)
+    else:
+        flash("You are not logged in!")
+        return redirect(url_for("login"))
+
+@app.route("/sent", methods=["POST", "GET"])
+def sent():
+    if "email" in session:
+        user = session["email"] 
+        password = session["password"]
+        inbox = get_inbox(folder='"[Gmail]/Sent Mail"')
         return render_template("user.html", inbox=inbox, user=user)
     else:
         flash("You are not logged in!")
