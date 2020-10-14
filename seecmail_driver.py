@@ -83,8 +83,10 @@ def compose():
                 file_data = f.read()
                 file_type = imghdr.what(f.name)
                 file_name = f.name
+            #print(f"File_name: {file_name}")
+            #print(f"Filename: {filename}")
             msg.add_attachment(file_data, maintype='image', subtype=file_type,
-                               filename=file_name)
+                               filename=filename)
             flash("File uploaded")
 
 
