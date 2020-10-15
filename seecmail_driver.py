@@ -1,11 +1,19 @@
 #!/usr/bin/env python
 
 from email.message import EmailMessage
+from email.mime.text import MIMEText
+from email.mime.base import MIMEBase
+#from email.mime.image import MIMEImage
+from email import encoders
+#from email.mime.application import MIMEApplication
+from email.mime.multipart import MIMEMultipart
 import email
 from flask import Flask, redirect, url_for, render_template, request, session, flash
 from datetime import timedelta, datetime
 import imghdr # for images 
+import mimetypes
 import os 
+from os.path import basename
 import smtplib
 import imaplib
 from werkzeug.utils import secure_filename
@@ -52,6 +60,7 @@ def get_inbox(folder="INBOX"):
 def home():
     return render_template("index.html")
 
+
 @app.route("/compose", methods=["POST", "GET"])
 def compose():
     # If they are hitting the send button
@@ -59,42 +68,56 @@ def compose():
         flash("You are not logged in.")
         return redirect(url_for("login"))
     # For debugging
-    print(session["email"])
+    #print(session["email"])
 
     if request.method == "POST":
-        msg = EmailMessage()
+        #msg = EmailMessage()
+        # Mixed message
+        msg = MIMEMultipart("alternative")
         msg["From"] = session["email"]
         msg["To"]= request.form["email_to"]
         msg["Subject"]= request.form["email_subject"]
-        msg.set_content(request.form["email_body"])
+        #msg.set_content(request.form["email_body"])
+        text = request.form["email_body"]
+        #msg.set_content(body)
 
-        print(f"Message: {msg}")
-        #print(f"TEST: {request.files['attachment']}")
-        upload = request.files['attachment']
+        # Attaching the text as plain text and html 
+        body_plain = MIMEText(text, 'plain')
+        body_html = MIMEText(text, 'html')
+        msg.attach(body_plain)
+        msg.attach(body_html)
         
-        # Uploading file to our assets directory
-        if upload.filename != '':
+        # Finding out what/if there is an attachment
+        upload = request.files['attachment']
+
+        # Checking for an upload, if there is then Uploading file to our assets directory
+        if upload.filename != '':  
             filename = secure_filename(upload.filename)
             assets_dir = os.path.join(os.getcwd(), 'uploads')
             # print(f"Assets: {assets_dir}")
-            upload.save( os.path.join('uploads',filename) )
+            upload.save( os.path.join('uploads', filename) )
             # Read the file data
             with open(os.path.join(assets_dir, upload.filename), 'rb') as f:
-                file_data = f.read()
-                file_type = imghdr.what(f.name)
-                file_name = f.name
-            #print(f"File_name: {file_name}")
-            #print(f"Filename: {filename}")
-            msg.add_attachment(file_data, maintype='image', subtype=file_type,
-                               filename=filename)
+                # Reading in the file we just saved to uploads and attaching it 
+                part = MIMEBase('application', 'octet-stream')
+                part.set_payload(f.read())
+                encoders.encode_base64(part)
+                part.add_header('Content-Disposition', 'attachment; filename="%s"' % basename(upload.filename))
+                msg.attach(part)
+
+
+#            msg.add_attachment(file_data, maintype='image', subtype=file_type,
+#                               filename=filename)
+            msg.attach(part) 
             flash("File uploaded")
 
 
         with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp:
+            # Actually sending the email
             smtp.login(session["email"], session["password"])
             #msg.set_type('text/html')
-            smtp.send_message(msg)
-
+            #smtp.send_message(msg)
+            smtp.sendmail(msg["From"], msg["To"], msg.as_string())
 
         flash("Message sent")
         return redirect(url_for("user"))
