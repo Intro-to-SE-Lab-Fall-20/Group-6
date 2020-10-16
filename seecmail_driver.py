@@ -55,10 +55,15 @@ def get_inbox(folder="INBOX"):
     my_message.sort(key=lambda d: d['date'], reverse=True) # Reverse order, newest first
     return my_message
 
-@app.route("/")
-@app.route("/home")
+@app.route("/", methods=["POST", "GET"])
+#@app.route("/home", methods=["POST", "GET"])
 def home():
-    return render_template("index.html")
+    #if request.method == "POST":
+        #render_template("login.html")
+       #return redirect(url_for("login"))
+   # else:
+      #  return render_template("index.html")
+    return redirect(url_for("user"))
 
 
 @app.route("/compose", methods=["POST", "GET"])
@@ -133,9 +138,14 @@ def login():
             session.permanent = True
             # Grab the data from the boxes after you hit login
             email = request.form["user_email"] # This variable from login.html
-            session["email"] = email  
+            if email == '':
+                return redirect(url_for("login"))
+            session["email"] = email
             password = request.form["user_password"]  # This variable from login.html
+            if password == '':
+                return redirect(url_for("login"))
             session["password"] = password
+
             # This will be where we do authentication 
             server = smtplib.SMTP(host='smtp.gmail.com', port=587)
             server.ehlo()
@@ -166,7 +176,7 @@ def user():
         inbox = get_inbox()
         return render_template("user.html", inbox=inbox, user=user)
     else:
-        flash("You are not logged in!")
+        flash("You are not logged in")
         return redirect(url_for("login"))
 
 @app.route("/sent", methods=["POST", "GET"])
