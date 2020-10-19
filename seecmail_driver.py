@@ -21,7 +21,7 @@ from werkzeug.utils import secure_filename
 app = Flask(__name__)
 app.secret_key = "testing"
 # Stop from allowing huge uploads
-app.config['MAX_CONTENT_LENGTH'] = 1024 * 1024  
+app.config['MAX_CONTENT_LENGTH'] = 1024 * 1024
 
 # Default folder is the inbox
 def get_inbox(folder="INBOX"): 
@@ -53,7 +53,50 @@ def get_inbox(folder="INBOX"):
                 email_data['html_body'] = part.get_payload(decode=True).decode()
         my_message.append(email_data)
     my_message.sort(key=lambda d: d['date'], reverse=True) # Reverse order, newest first
+    mail.logout()
     return my_message
+
+def search(searchTerm):
+    server = "imap.gmail.com"  # For example, “imap.gmail.com“
+    user = session["email"]  # For example, “example.imap.python.user“
+    password = session["password"]  # For example, “example.imap.python.password”
+    mailbox = "Inbox"  # For example, “Inbox” or “[Gmail]/All Mail“
+    mail = imaplib.IMAP4_SSL(server)
+    mail.login(user, password)
+    mail.select(mailbox, True)
+    my_message = []
+    try:
+        _, search_data = mail.search(None, "TEXT " + searchTerm)
+        #print(search_data)
+    except:
+        print("SEARCH ERROR")
+
+    for num in search_data[0].split():
+        email_data = {}
+        # These codes are documented here:
+        # https://tools.ietf.org/html/rfc3501
+        _, data = mail.fetch(num, '(RFC822)')
+        _, b = data[0]
+        #print(b)
+
+        email_message = email.message_from_bytes(b)
+        # Grabbing and formatting the data that we want to display
+        for header in ['subject', 'to', 'from']:  # , 'date']:
+            email_data[header] = email_message[header]
+        # Convert to datetime format for descending order
+        time_fmt = " ".join(email_message['date'].split()[:5])
+        dt = datetime.strptime(time_fmt, '%a, %d %b %Y %H:%M:%S')
+        email_data['date'] = dt
+        for part in email_message.walk():
+            if part.get_content_type() == "text/plain":
+                email_data['body'] = part.get_payload(decode=True).decode()
+            elif part.get_content_type() == "text/html":
+                email_data['html_body'] = part.get_payload(decode=True).decode()
+        my_message.append(email_data)
+    my_message.sort(key=lambda d: d['date'], reverse=True)  # Reverse order, newest first
+    mail.logout()
+    return my_message
+
 
 @app.route("/", methods=["POST", "GET"])
 #@app.route("/home", methods=["POST", "GET"])
@@ -135,7 +178,7 @@ def login():
     if request.method == "POST":
         # if they press the login button
         if 'login_button' in request.form:
-            session.permanent = True
+            session.permanent = False
             # Grab the data from the boxes after you hit login
             email = request.form["user_email"] # This variable from login.html
             if email == '':
@@ -170,6 +213,11 @@ def login():
 @app.route("/user", methods=["POST", "GET"])
 def user():
     email = None
+    if request.method == "POST":
+        user = session["email"]
+        password = session["password"]
+        inbox = search(request.form['searchTerm'])
+        return render_template("user.html", inbox=inbox, user = user)
     if "email" in session:
         user = session["email"]
         password = session["password"]
