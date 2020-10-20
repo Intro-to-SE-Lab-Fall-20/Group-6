@@ -8,7 +8,7 @@
             {% endfor %}
         {% endif %}
     {% endwith %}
-<p>Welcome, {{user}}!</p>
+<p>Welcome, {{ current_user.username }}!</p>
 <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
 <link rel="stylesheet" type="text/css" href="../static/main.css">
 <div class="container">
@@ -22,16 +22,16 @@
 					<div class="col-md-3">
 						<h2 class="grid-title"><i class="fa fa-inbox"></i> Inbox</h2>
                         <!-- <a class="btn btn-block btn-primary" data-toggle="modal" data-target="#compose-modal"><i class="fa fa-pencil"></i>&nbsp;&nbsp;NEW MESSAGE</a> -->
-                        <a class="btn btn-block btn-link"><a href="/compose">&nbsp;&nbsp;NEW MESSAGE</a>
+                        <a class="btn btn-block btn-link"><a href="{{ url_for('compose', username=current_user.username) }}">&nbsp;&nbsp;NEW MESSAGE</a>
 						<hr>
 
 						<div>
 							<ul style="display: block;" class="nav nav-pills nav-stacked">
 								<li class="header">Folders</li>
-                                <li class="active"><a href="/user"><i class="fa fa-inbox"></i> Inbox </a></li> <!-- ({{inbox|length}})</a></li> --> 
+                                <li class="active"><a href="{{ url_for('user', username=current_user.username) }}"><i class="fa fa-inbox"></i> Inbox </a></li> <!-- ({{inbox|length}})</a></li> --> 
 <!--								<li><a href="#"><i class="fa fa-star"></i> Starred</a></li>
 <li><a href="#"><i class="fa fa-bookmark"></i> Important</a></li> MDB -->
-								<li><a href="/sent"><i class="fa fa-mail-forward"></i> Sent</a></li>
+<li><a href="{{ url_for('sent', username=current_user.username) }}"><i class="fa fa-mail-forward"></i> Sent</a></li>
 <!--								<li><a href="#"><i class="fa fa-pencil-square-o"></i> Drafts</a></li>
 <li><a href="#"><i class="fa fa-folder"></i> Spam (217)</a></li> MDB -->
 							</ul>
@@ -62,19 +62,32 @@
                             </div>  --> 
 
 							<div class="col-md-6 search-form" style="margin-bottom: 15px; margin-top: 22.5px">
-								<form action="#" method = "post" name = "search" class="text-right">
+								<form action="#" method = "post" class="text-right" name = "search_bar">
 									<div class="input-group">
-										<input type="text" name = "searchTerm" class="form-control input-sm" placeholder="Search">
+										<input type="text" class="form-control input-sm" placeholder="Search" name = "search_term">
 										<span class="input-group-btn">
                                             <button style="margin-left: 5px; margin-top: 3px;" type="submit" name="search" class="btn_ btn-primary btn-sm search"><i class="fa fa-search"></i></button></span>
 									</div>			 
 								</form>
 							</div>
 						</div>
-						
+
 						<div class="padding"></div>
 						
 						<div class="table-responsive">
+
+					{% with messages = get_flashed_messages(with_categories=true) %}
+							{% if messages %}
+  						  <ul class=flashes>
+							  {% for searched_for, message in messages %}
+      			<li class="{{ searched_for }}">{{ message }}</li>
+   						 {% endfor %}
+  						  </ul>
+ 							 {% endif %}
+							{% endwith %}
+
+
+                            {% block display %}
 							<table class="table">
 								<tbody>
                                 {% for message in inbox %}
@@ -82,12 +95,13 @@
 									<td class="action"><input type="checkbox" /></td>
 									<!-- <td class="action"><i class="fa fa-star-o"></i></td>
                                     <td class="action"><i class="fa fa-bookmark-o"></i></td> --> 
-                                    <td class="name"><a href="#" style="background-color:#FFFFFF;color:#000000;text-decoration:none">{{message['from']}}</a></td>
-                                    <td class="subject"><a href="#" style="background-color:#FFFFFF;color:#000000;text-decoration:none">{{message['subject']}}</a></td>
+                                    <td class="name"><a href="{{ url_for('viewemail', username=current_user.username, emailid=message['emailid']) }}" style="background-color:#FFFFFF;color:#000000;text-decoration:none">{{message['from']}}</a></td>
+                                    <td class="subject"><a href="{{ url_for('viewemail', username=current_user.username, emailid=message['emailid']) }}" style="background-color:#FFFFFF;color:#000000;text-decoration:none">{{message['subject']}}</a></td>
                                     <td class="time">{{message['date']}}</td>
 								</tr>
                                 {% endfor %}
 							</tbody></table>
+                            {% endblock %}
 						</div>
 
 						<!-- <ul class="pagination">
@@ -139,8 +153,8 @@
 								</div>
 							</div>
 						</div>
-					</div>-->
-                    <!--END COMPOSE MESSAGE -->
+					</div>
+                    <!-- END COMPOSE MESSAGE -->  
 				</div>
 			</div>
 		</div>
