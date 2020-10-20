@@ -43,7 +43,7 @@ Raysita Maharani is an undergraduate student majoring in Software Engineering.
 <h3>Justin Paulk</h3>
 github username: CognizantPotato https://github.com/CognizantPotato
 
-Justin Paulk is an undergraduate student majoring in Software Engineering.
+Justin paulk is an undergraduate student majoring in Software Engineering.
 
 
 
