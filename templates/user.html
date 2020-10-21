@@ -84,9 +84,9 @@
 									<td class="action"><input type="checkbox" /></td>
 									<!-- <td class="action"><i class="fa fa-star-o"></i></td>
                                     <td class="action"><i class="fa fa-bookmark-o"></i></td> --> 
-                                    <td class="name"><a href="{{ url_for('viewemail', username=current_user.username, emailid=message['emailid']) }}" style="background-color:#FFFFFF;color:#000000;text-decoration:none">{{message['from']}}</a></td>
-                                    <td class="subject"><a href="{{ url_for('viewemail', username=current_user.username, emailid=message['emailid']) }}" style="background-color:#FFFFFF;color:#000000;text-decoration:none">{{message['subject']}}</a></td>
-                                    <td class="time">{{message['date']}}</td>
+                                    <td class="name"><a href="{{ url_for('viewemail', username=current_user.username, emailid=message.emailid) }}" style="background-color:#FFFFFF;color:#000000;text-decoration:none">{{message.sender}}</a></td>
+                                    <td class="subject"><a href="{{ url_for('viewemail', username=current_user.username, emailid=message.emailid) }}" style="background-color:#FFFFFF;color:#000000;text-decoration:none">{{message.subject}}</a></td>
+                                    <td class="time">{{message.date}}</td>
 								</tr>
                                 {% endfor %}
 							</tbody></table>

@@ -66,54 +66,131 @@ class RegistrationForm(FlaskForm):
             raise ValidationError("Someone is already registered with this email address.  Choose another.")
 
 class User(UserMixin, db.Model):
+
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
-    password_hash = db.Column(db.String(80))
+    #password_hash = db.Column(db.String(80))
+    password = db.Column(db.String(80))
+    emails = db.relationship('SeecMail', backref='username', lazy='dynamic')
 
     def __repr__(self):
-        return 'User: %r' % self.username
+        return f"User: {self.username}" 
 
-    def set_password(self, password):
-        self.password_hash = generate_password_hash(password)
+    #def set_password(self, password):
+    #    self.password_hash = generate_password_hash(password)
 
-    def check_password(self, password):
-        return check_password_hash(self.password_hash, password)
+    #def check_password(self, password):
+    #    return check_password_hash(self.password_hash, password)
 
+def refresh_inbox():
+    emails = SeecMail.query.all()
+    for e in emails: 
+        db.session.delete(e)
+    db.session.commit()
+    #print(f"Inbox refreshed")
 
-# Default folder is the inbox
-def get_inbox(folder="INBOX"): 
+def get_inbox(folder='INBOX'):
+    refresh_inbox()
     host = 'imap.gmail.com'
     mail = imaplib.IMAP4_SSL(host)
     mail.login(session["email"], session["password"])
     mail.select(folder)
+    user = User.query.filter_by(email=session["email"]).first()
+    print(f"Debug username: {user}")
     _, search_data = mail.search(None, "ALL")
-    my_message = []
     for num in search_data[0].split():
-        email_data = {}
-        # These codes are documented here:
-        # https://tools.ietf.org/html/rfc3501
+        seecmail = SeecMail()
         _, data = mail.fetch(num, '(RFC822)')
         _, b = data[0]
-
         email_message = email.message_from_bytes(b)
-        # Grabbing and formatting the data that we want to display
-        for header in ['subject', 'to', 'from']: # , 'date']:
-            email_data[header] = email_message[header]
-        # Convert to datetime format for descending order
+        # Set subject, to, and sender (from)
+        seecmail.subject = email_message['subject']
+        seecmail.to = email_message['to']
+        seecmail.sender = email_message['from']
+        # Format and set time
         time_fmt = " ".join(email_message['date'].split()[:5])
         dt = datetime.strptime(time_fmt, '%a, %d %b %Y %H:%M:%S')
-        email_data['date'] = dt
-        email_data['emailid'] = md5(str(email_message).encode('utf-8')).hexdigest() 
-        #print(f"Email_data_id: {email_data['emailid']}")
+        seecmail.date = dt
+
         for part in email_message.walk():
             if part.get_content_type() == "text/plain":
-                email_data['body'] = part.get_payload(decode=True).decode()
+                seecmail.body = part.get_payload(decode=True).decode()
             elif part.get_content_type() == "text/html":
-                email_data['html_body'] = part.get_payload(decode=True).decode()
-        my_message.append(email_data)
-    my_message.sort(key=lambda d: d['date'], reverse=True) # Reverse order, newest first
-    return my_message
+                seecmail.html_body = part.get_payload(decode=True).decode()
+        seecmail.mailbox = folder
+        seecmail.emailid = md5(str(email_message).encode('utf-8')).hexdigest() 
+        seecmail.username = user 
+        db.session.add(seecmail)
+    db.session.commit()
+
+def get_inbox_messages(user):
+    # Refresh the inbox database and grab emails
+    inbox = get_inbox()
+    return SeecMail.query.order_by(SeecMail.date.desc()).filter_by(username=user, mailbox='INBOX').all()
+
+def get_sent_messages(user):
+    folder = '"[Gmail]/Sent Mail"'
+    inbox = get_inbox(folder)
+    return SeecMail.query.order_by(SeecMail.date.desc()).filter_by(username=user, mailbox=folder).all()
+
+
+class SeecMail(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    mailbox = db.Column(db.String(128))
+    body = db.Column(db.String(2048))
+    html_body = db.Column(db.String(2048))
+    date = db.Column(db.DateTime, index=True)
+    to = db.Column(db.String(128))
+    sender = db.Column(db.String(128))
+    subject = db.Column(db.String(1024))
+    emailid = db.Column(db.String(128), unique=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+
+    def __repr__(self):
+        return f"Email subject: {self.subject}"
+
+
+# Default folder is the inbox
+#def get_inbox(folder="INBOX"): 
+#    host = 'imap.gmail.com'
+#    mail = imaplib.IMAP4_SSL(host)
+#    mail.login(session["email"], session["password"])
+#    mail.select(folder)
+#    _, search_data = mail.search(None, "ALL")
+#    my_message = []
+#    for num in search_data[0].split():
+#        seec_message = SeecMail()   
+#        # These codes are documented here:
+#        # https://tools.ietf.org/html/rfc3501
+#        _, data = mail.fetch(num, '(RFC822)')
+#        _, b = data[0]
+#
+#        email_message = email.message_from_bytes(b)
+#        # Grabbing and formatting the data that we want to display
+#        #for header in ['subject', 'to', 'from']: # , 'date']:
+#        #    email_data[header] = email_message[header]
+#        seec_message.subject = email_message['subject']
+#        seec_message.to = email_message['to']
+#        seec_message.sender = email_message['from']
+#        # Convert to datetime format for descending order
+#        time_fmt = " ".join(email_message['date'].split()[:5])
+#        dt = datetime.strptime(time_fmt, '%a, %d %b %Y %H:%M:%S')
+#        seec_message.date = dt
+#        seec_message.emailid = md5(str(email_message).encode('utf-8')).hexdigest() 
+#        #print(f"Email_data_id: {email_data['emailid']}")
+#        for part in email_message.walk():
+#            if part.get_content_type() == "text/plain":
+#                seec_message.body = part.get_payload(decode=True).decode()
+#            elif part.get_content_type() == "text/html":
+#                seec_message.html_body = part.get_payload(decode=True).decode()
+#        #my_message.append(email_data)
+#        user = User.query.filter_by(email=session["email"]).first()
+#        seec_message.username = user
+#        db.session.add(seec_message)
+#    db.session.commit()
+#    #my_message.sort(key=lambda d: d['date'], reverse=True) # Reverse order, newest first
+#    return my_message
 
 @app.route("/", methods=["POST", "GET"])
 @app.route("/home", methods=["POST", "GET"])
@@ -198,7 +275,7 @@ def login():
     if form.validate_on_submit():
         user = User.query.filter_by(username=form.username.data).first()
         print(f"DEBUG: {user}")
-        if user is None or not user.check_password(form.password.data):
+        if user is None: # or not user.check_password(form.password.data):
             flash("Invalid username or password")
             return redirect(url_for('login'))
         login_user(user, remember=form.remember_me.data)
@@ -223,41 +300,6 @@ def login():
             return render_template("login.html", title="Sign In", form=form)
     else:
         return render_template("login.html", title='Sign In', form=form)
-        #flash(f'Login requested for user {form.username.data}, remember_me={form.remember_me.data}')
-#        next_page = request.args.get('next')
-#        print(f"Next page?: {next_page}")
-#        if not next_page or url_parse(next_page).netloc != '':
-            #print(f"I'm in this if statement: {user.username}")
-            #next_page = url_for('user', username=user)
-            #return render_template('user.html', username=user.username, user=user)
-#            return redirect(url_for('user', username=user.username))
-#    if request.method == "POST":
-        # if they press the login button
-#        if 'login_button' in request.form:
-#            session.permanent = True
-#            # Grab the data from the boxes after you hit login
-#            email = request.form["user_email"] # This variable from login.html
-#            session["email"] = email
-#            password = request.form["user_password"]  # This variable from login.html
-#            session["password"] = password
-#
-#            # This will be where we do authentication 
-#            server = smtplib.SMTP(host='smtp.gmail.com', port=587)
-#            server.ehlo()
-#            server.starttls()
-#            try:
-#                server.login(email, password)
-#                flash("Login successful!")
-#                return redirect(url_for("user"))
-#            except smtplib.SMTPAuthenticationError as e:
-#                print(f"Error: {e}")
-#                flash("You have entered an invalid username or password, try again!")
-#                flash("Your account may not allow less secure apps or requires two-factor authentication: "
-#                      "https://myaccount.google.com/u/1/lesssecureapps?pli=1&pageId=none")
-#                # Clear these values for security purposes
-#                session["email"] = None
-#                session["password"] = None
-#                return render_template("login.html")
 
 @app.route("/register", methods=["POST", "GET"])
 def register():
@@ -266,8 +308,8 @@ def register():
 #        return redirect(url_for(user))
     form = RegistrationForm()
     if form.validate_on_submit():
-        user = User(username=form.username.data, email=form.email.data)
-        user.set_password(form.password.data)
+        user = User(username=form.username.data, email=form.email.data, password=form.password.data)
+        #user.set_password(form.password.data)
         db.session.add(user)
         db.session.commit()
         flash("You are now registered as a new user.")
@@ -278,34 +320,25 @@ def register():
 @app.route("/user/<username>", methods=["POST", "GET"])
 @login_required
 def user(username):
-    print(f"User from func: {username}")
+    #print(f"User from func: {username}")
     user = User.query.filter_by(username=username).first_or_404()
-    inbox = get_inbox()
+    inbox = get_inbox_messages(user)
     return render_template("user.html", inbox=inbox, username=user)
-#    email = None
-#    if "email" in session:
-#        user = session["email"]
-#        password = session["password"]
-#        inbox = get_inbox()
-#        return render_template("user.html", inbox=inbox, user=user)
-#    else:
-#        flash("You are not logged in")
-#        return redirect(url_for("login"))
 
-def get_email(inbox, email_id):
-    for message in inbox: 
-        if message['emailid'] == email_id: 
-            return message
-    print(f"Something went horribly wrong. Exiting.")
-    sys.exit()
+#def get_email(inbox, email_id):
+#    for message in inbox: 
+#        if message['emailid'] == email_id: 
+#            return message
+#    print(f"Something went horribly wrong. Exiting.")
+#    sys.exit()
 
 @app.route("/user/<username>/viewemail/<emailid>")
 @login_required
 def viewemail(username, emailid):
-    inbox = get_inbox()
-    message = get_email(inbox, emailid)
-    for key, value in message.items():
-        print(f"key: {key}\nvalue: {value}")
+    #inbox = get_inbox()
+    #message = get_email(inbox, emailid)
+    message = SeecMail.query.filter_by(emailid=emailid).first()
+    print(f"Message: {message}")
     return render_template('read.html', message=message, username=username)
 
 
@@ -313,14 +346,9 @@ def viewemail(username, emailid):
 @app.route("/user/<username>/sent", methods=["POST", "GET"])
 @login_required
 def sent(username):
-    if "email" in session:
-        user = session["email"] 
-        password = session["password"]
-        inbox = get_inbox(folder='"[Gmail]/Sent Mail"')
-        return render_template("user.html", inbox=inbox, user=user)
-    else:
-        flash("You are not logged in!")
-        return redirect(url_for("login"))
+    user = User.query.filter_by(username=username).first_or_404()
+    inbox = get_inbox_messages(user)
+    return render_template("user.html", inbox=inbox, user=user)
 
 @app.route("/logout")
 def logout():
@@ -338,18 +366,13 @@ def logout():
         flash(f"You are not logged in yet")
         return redirect(url_for("login"))
 
-def setup_db(db):
-    try:
-        admin = User(username="admin", email="admin@email.com", password="pass1234")
-        db.session.add(admin)
-        db.session.commit()
-    except IntegrityError:
-        print(f"User is already in the database")
-
 def reset_db(db):
     users = User.query.all()
+    emails = SeecMail.query.all()
     for u in users:
         db.session.delete(u)
+    for e in emails:
+        db.session.delete(e)
     db.session.commit()
 
 if __name__ == "__main__":
