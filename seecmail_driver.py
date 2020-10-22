@@ -313,6 +313,33 @@ def register():
         return redirect(url_for('login'))
     return render_template('register.html', title='Register', form=form)
 
+@app.route("/user/<username>/forward/<emailid>", methods=["POST", "GET"])
+@login_required
+def forward(username, emailid):
+    message = SeecMail.query.filter_by(emailid=emailid).first()
+    if request.method == "POST":
+        #msg = EmailMessage()
+        # Mixed message
+        msg = MIMEMultipart("alternative")
+        msg["From"] = session["email"]
+        msg["To"]= request.form["email_to"]
+        msg["Subject"]= request.form["email_subject"]
+        #msg.set_content(request.form["email_body"])
+        text = request.form["email_body"]
+
+        body_plain = MIMEText(text, 'plain')
+        body_html = MIMEText(text, 'html')
+        msg.attach(body_plain)
+        msg.attach(body_html)
+
+        with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp:
+            smtp.login(session["email"], session["password"])
+            smtp.sendmail(msg["From"], msg["To"], msg.as_string())
+
+        flash("Message forwarded")
+        return redirect(url_for("user", username=username))
+
+    return render_template("forward.html", message=message, username=username)
 
 @app.route("/user/<username>", methods=["POST", "GET"])
 @login_required
@@ -339,7 +366,7 @@ def viewemail(username, emailid):
     #message = get_email(inbox, emailid)
     message = SeecMail.query.filter_by(emailid=emailid).first()
     #print(f"Message: {message}")
-    return render_template('read.html', message=message, username=username)
+    return render_template('read.html', message=message, username=username, emailid=emailid)
 
 
 @app.route("/user/<username>/sent", methods=["POST", "GET"])
