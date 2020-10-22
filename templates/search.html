@@ -1,11 +1,11 @@
 {% extends "base.html" %}
-{% block title%}User{% endblock %}
+{% block title%}Search{% endblock %}
 {% block content %}
 <h5>Welcome, {{ current_user.username }}!</h5>
 {% with messages = get_flashed_messages() %}
         {% if messages %}
             {% for msg in messages %}
-                <p>{{msg}}</p>
+<!--                <p>{{msg}}</p>-->
             {% endfor %}
         {% endif %}
     {% endwith %}
@@ -20,7 +20,7 @@
 				<div class="row">
 					<!-- BEGIN INBOX MENU -->
 					<div class="col-md-3">
-						<h2 class="grid-title"><i class="fa fa-inbox"></i> Inbox</h2>
+						<h2 class="grid-title"><i class="fa fa-inbox"></i> Search</h2>
                         <!-- <a class="btn btn-block btn-primary" data-toggle="modal" data-target="#compose-modal"><i class="fa fa-pencil"></i>&nbsp;&nbsp;NEW MESSAGE</a> -->
                         <a class="btn btn-block btn-link"><a href="{{ url_for('compose', username=current_user.username) }}">&nbsp;&nbsp;NEW MESSAGE</a>
 						<hr>
@@ -62,7 +62,7 @@
                             </div>  -->
 
 							<div class="col-md-6 search-form" style="margin-bottom: 15px; margin-top: 22.5px">
-								<form action="#" method="post" class="text-right" name = "search_bar">
+								<form action="#" method = "post" class="text-right" name = "search_bar">
 									<div class="input-group">
 										<input type="text" class="form-control input-sm" placeholder="Search" name = "search_term">
 										<span class="input-group-btn">
@@ -71,7 +71,6 @@
 								</form>
 							</div>
 						</div>
-
 						<div class="padding"></div>
 
 						<div class="table-responsive">
@@ -79,7 +78,7 @@
 							{% with messages = get_flashed_messages(with_categories=true) %}
 							{% if messages %}
 							{% for searched_for, message in messages %}
-<!--      							<h5 id="searchFlash" class="{{ searched_for }}">{{ message }}</h5>-->
+      							<h5 id="searchFlash" class="{{ searched_for }}">{{ message }}</h5>
    						 	{% endfor %}
 							{% endif %}
 							{% endwith %}
@@ -150,8 +149,8 @@
 								</div>
 							</div>
 						</div>
-					</div>
-                    <!-- END COMPOSE MESSAGE -->
+					</div>-->
+                    <!--END COMPOSE MESSAGE -->
 				</div>
 			</div>
 		</div>

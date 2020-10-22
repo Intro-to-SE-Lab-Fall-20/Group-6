@@ -325,8 +325,10 @@ def user(username):
         inbox = search(request.form['search_term'])
         if not inbox:
             flash("No matches found for " + request.form['search_term'], 'searched_for')
+            return render_template("search.html", inbox = inbox, username = user)
         else:
             flash("Search results for " + request.form['search_term'], 'searched_for')
+            return render_template("search.html", inbox = inbox, username = user)
 
     return render_template("user.html", inbox=inbox, username=user)
 #    email = None
@@ -364,7 +366,7 @@ def sent(username):
         user = session["email"] 
         password = session["password"]
         inbox = get_inbox(folder='"[Gmail]/Sent Mail"')
-        return render_template("user.html", inbox=inbox, user=user)
+        return render_template("sent.html", inbox=inbox, user=user)
     else:
         flash("You are not logged in!")
         return redirect(url_for("login"))
