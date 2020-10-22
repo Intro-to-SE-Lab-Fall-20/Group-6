@@ -357,7 +357,6 @@ def viewemail(username, emailid):
     return render_template('read.html', message=message, username=username)
 
 
-
 @app.route("/user/<username>/sent", methods=["POST", "GET"])
 @login_required
 def sent(username):
