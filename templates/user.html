@@ -62,19 +62,32 @@
                             </div>  --> 
 
 							<div class="col-md-6 search-form" style="margin-bottom: 15px; margin-top: 22.5px">
-								<form action="#" class="text-right">
+								<form action="#" method = "post" class="text-right" name = "search_bar">
 									<div class="input-group">
-										<input type="text" class="form-control input-sm" placeholder="Search">
+										<input type="text" class="form-control input-sm" placeholder="Search" name = "search_term">
 										<span class="input-group-btn">
                                             <button style="margin-left: 5px; margin-top: 3px;" type="submit" name="search" class="btn_ btn-primary btn-sm search"><i class="fa fa-search"></i></button></span>
 									</div>			 
 								</form>
 							</div>
 						</div>
-						
+
 						<div class="padding"></div>
 						
 						<div class="table-responsive">
+
+					{% with messages = get_flashed_messages(with_categories=true) %}
+							{% if messages %}
+  						  <ul class=flashes>
+							  {% for searched_for, message in messages %}
+      			<li class="{{ searched_for }}">{{ message }}</li>
+   						 {% endfor %}
+  						  </ul>
+ 							 {% endif %}
+							{% endwith %}
+
+
+                            {% block display %}
 							<table class="table">
 								<tbody>
                                 {% for message in inbox %}
@@ -82,12 +95,13 @@
 									<td class="action"><input type="checkbox" /></td>
 									<!-- <td class="action"><i class="fa fa-star-o"></i></td>
                                     <td class="action"><i class="fa fa-bookmark-o"></i></td> --> 
-                                    <td class="name"><a href="#" style="background-color:#FFFFFF;color:#000000;text-decoration:none">{{message['from']}}</a></td>
-                                    <td class="subject"><a href="#" style="background-color:#FFFFFF;color:#000000;text-decoration:none">{{message['subject']}}</a></td>
+                                    <td class="name"><a href="{{ url_for('viewemail', username=current_user.username, emailid=message['emailid']) }}" style="background-color:#FFFFFF;color:#000000;text-decoration:none">{{message['from']}}</a></td>
+                                    <td class="subject"><a href="{{ url_for('viewemail', username=current_user.username, emailid=message['emailid']) }}" style="background-color:#FFFFFF;color:#000000;text-decoration:none">{{message['subject']}}</a></td>
                                     <td class="time">{{message['date']}}</td>
 								</tr>
                                 {% endfor %}
 							</tbody></table>
+                            {% endblock %}
 						</div>
 
 						<!-- <ul class="pagination">

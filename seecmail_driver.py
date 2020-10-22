@@ -12,6 +12,7 @@ from flask import Flask, redirect, url_for, render_template, request, session, f
 from flask_wtf import FlaskForm
 from flask_login import login_required, current_user, login_user, logout_user, LoginManager, UserMixin
 from flask_sqlalchemy import SQLAlchemy
+from hashlib import md5
 from sqlalchemy.exc import IntegrityError
 from datetime import timedelta, datetime
 import imghdr # for images 
@@ -81,13 +82,14 @@ class User(UserMixin, db.Model):
 
 
 # Default folder is the inbox
-def get_inbox(folder="INBOX"): 
+def get_inbox(folder="INBOX"):
     host = 'imap.gmail.com'
     mail = imaplib.IMAP4_SSL(host)
     mail.login(session["email"], session["password"])
     mail.select(folder)
     _, search_data = mail.search(None, "ALL")
     my_message = []
+
     for num in search_data[0].split():
         email_data = {}
         # These codes are documented here:
@@ -103,6 +105,46 @@ def get_inbox(folder="INBOX"):
         time_fmt = " ".join(email_message['date'].split()[:5])
         dt = datetime.strptime(time_fmt, '%a, %d %b %Y %H:%M:%S')
         email_data['date'] = dt
+        email_data['emailid'] = md5(str(email_message).encode('utf-8')).hexdigest() 
+        #print(f"Email_data_id: {email_data['emailid']}")
+        for part in email_message.walk():
+            if part.get_content_type() == "text/plain":
+                email_data['body'] = part.get_payload(decode=True).decode()
+            elif part.get_content_type() == "text/html":
+                email_data['html_body'] = part.get_payload(decode=True).decode()
+        my_message.append(email_data)
+    my_message.sort(key=lambda d: d['date'], reverse=True) # Reverse order, newest first
+    return my_message
+
+def search(searchTerm, folder="INBOX"):
+    host = 'imap.gmail.com'
+    mail = imaplib.IMAP4_SSL(host)
+    mail.login(session["email"], session["password"])
+    mail.select(folder)
+    try:
+        _, search_data = mail.search(None, "TEXT " + searchTerm)
+    except:
+        print("ERROR SEARCHING")
+
+    my_message = []
+
+    for num in search_data[0].split():
+        email_data = {}
+        # These codes are documented here:
+        # https://tools.ietf.org/html/rfc3501
+        _, data = mail.fetch(num, '(RFC822)')
+        _, b = data[0]
+
+        email_message = email.message_from_bytes(b)
+        # Grabbing and formatting the data that we want to display
+        for header in ['subject', 'to', 'from']: # , 'date']:
+            email_data[header] = email_message[header]
+        # Convert to datetime format for descending order
+        time_fmt = " ".join(email_message['date'].split()[:5])
+        dt = datetime.strptime(time_fmt, '%a, %d %b %Y %H:%M:%S')
+        email_data['date'] = dt
+        email_data['emailid'] = md5(str(email_message).encode('utf-8')).hexdigest()
+        #print(f"Email_data_id: {email_data['emailid']}")
         for part in email_message.walk():
             if part.get_content_type() == "text/plain":
                 email_data['body'] = part.get_payload(decode=True).decode()
@@ -278,6 +320,14 @@ def user(username):
     print(f"User from func: {username}")
     user = User.query.filter_by(username=username).first_or_404()
     inbox = get_inbox()
+
+    if request.method == "POST":
+        inbox = search(request.form['search_term'])
+        if not inbox:
+            flash("No matches found for " + request.form['search_term'], 'searched_for')
+        else:
+            flash("Search results for " + request.form['search_term'], 'searched_for')
+
     return render_template("user.html", inbox=inbox, username=user)
 #    email = None
 #    if "email" in session:
@@ -288,6 +338,24 @@ def user(username):
 #    else:
 #        flash("You are not logged in")
 #        return redirect(url_for("login"))
+
+
+def get_email(inbox, email_id):
+    for message in inbox: 
+        if message['emailid'] == email_id: 
+            return message
+    print(f"Something went horribly wrong. Exiting.")
+    sys.exit()
+
+@app.route("/user/<username>/viewemail/<emailid>")
+@login_required
+def viewemail(username, emailid):
+    inbox = get_inbox()
+    message = get_email(inbox, emailid)
+    for key, value in message.items():
+        print(f"key: {key}\nvalue: {value}")
+    return render_template('read.html', message=message, username=username)
+
 
 @app.route("/user/<username>/sent", methods=["POST", "GET"])
 @login_required
