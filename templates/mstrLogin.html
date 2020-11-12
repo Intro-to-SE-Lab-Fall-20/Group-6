@@ -1,0 +1,78 @@
+{% extends "mstrBase.html" %}
+{% block title %}Login Page{% endblock %}
+
+{% block content %}
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for msg in messages %}
+                <p>{{msg}}</p>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    <!-- <link rel="stylesheet" type="text/css" href="../static/main.css"> -->
+<form action="" method="post" novalidate>
+    {{ form.hidden_tag() }}
+    <!-- <p>Email:</p>
+    <p><input type="email" name="user_email" /> </p>
+    <p>Password:</p>
+    <p><input type="password" name="user_password" /> </p>
+    <p><input type="submit" name="login_button" value="Login" /> </p>
+    <p>New Users - Register Below</p>
+    <p><input type="submit" name="register_button" value="Register" /></p> -->
+    <p>
+        {{ form.username.label }}<br>
+        {{ form.username(size=32) }}
+        {% for error in form.username.errors %}
+        <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}
+    </p>
+    <p>
+        {{ form.password.label }}<br>
+        {{ form.password(size=32) }}
+        {% for error in form.password.errors %}
+        <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}
+    </p>
+    <p>{{ form.remember_me() }} {{ form.remember_me.label }}</p>
+    <p>{{ form.submit() }}</p>
+    <p>New Users: <a href="{{ url_for('mstrRegister') }}">Register Here</a></p>
+</form>
+{% endblock %}
+
+
+
+
+
+<!--<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Master Login</title>
+</head>
+<body>
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    <ul class=flashes>
+    {% for message in messages %}
+      <li>{{ message }}</li>
+    {% endfor %}
+    </ul>
+  {% endif %}
+{% endwith %}
+    <form action = "" method = "post">
+        Username
+        <br>
+        <input type = "text" name = "username">
+        <br>
+        Password
+        <br>
+        <input type = "password" name = "password">
+
+        <br>
+        <input type = "submit" name = "submit" value = "submit">
+        <a href = "mstrRegister.html"> Register </a>
+        <br>
+
+    </form>
+</body>
+</html>-->
