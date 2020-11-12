@@ -404,7 +404,7 @@ def reset_db(db):
 if __name__ == "__main__":
     db.create_all()
     #reset_db(db)
-    app.run(debug=True)
+    app.run(debug=True, port = 5001)
 
 
 
