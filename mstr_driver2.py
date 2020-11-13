@@ -58,6 +58,7 @@ class User(UserMixin, db.Model):
     # password_hash = db.Column(db.String(80))
     password = db.Column(db.String(80))
 
+
     def __repr__(self):
         return f"User: {self.username}"
 
@@ -138,9 +139,13 @@ def mstrRegister():
 @login_required
 def mstrUser(username):
     # print(f"User from func: {username}")
+    if request.method == "POST":
+        print("Post")
+        if request.form['button'] == 'SEECMail':
+            return redirect('http://localhost:5001/')
+        if request.form['button'] == 'Notes':
+            return redirect(url_for('mstrNotes'))
     user = User.query.filter_by(username=username).first_or_404()
-
-
     return render_template("mstrUser.html", username=user)
 
 
@@ -216,8 +221,9 @@ def reset_db(db):
 
 
 if __name__ == "__main__":
+    db.create_all()
     #reset_db(db)
-    app.run(debug=True, port=5001)
+    app.run(debug=True, port=5000)
 
 
 
