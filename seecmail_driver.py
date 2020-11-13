@@ -265,9 +265,9 @@ def compose(username):
 @app.route("/login", methods=["POST", "GET"])
 def login():
     # event if user is logged in and attempts to go to /login
-    if current_user.is_authenticated:
+    #if current_user.is_authenticated:
         #print(f"Current_user: {current_user}")
-        return redirect(url_for('user', username=current_user.username))
+    #    return redirect(url_for('user', username=current_user.username))
     form = LoginForm()
     if form.validate_on_submit():
         user = User.query.filter_by(username=form.username.data).first()
@@ -280,6 +280,24 @@ def login():
         server = smtplib.SMTP(host='smtp.gmail.com', port=587)
         server.ehlo()
         server.starttls()
+        tot_locked_mins = 1
+        if 'locked_time' in session:
+            session["attempts"] = 0
+            time_remaining = datetime.now() - session["locked_time"]
+            print(f"time remaining in minutes: {(time_remaining.seconds//60)%60}")
+            print(f"tot_locked_mins: {tot_locked_mins}")
+            print(f"{(time_remaining.seconds//60)%60 >= tot_locked_mins}")
+            if (time_remaining.seconds//60)%60 >= tot_locked_mins:
+                session.pop("locked_time", None)
+                session["attempts"] = 0
+                session.pop('_flashes', None)
+                flash("You are out of jail and may log in now")
+                return render_template("login.html", title='Sign In', form=form)
+            else:
+                mins_remaining = tot_locked_mins - (time_remaining.seconds//60)%60
+                flash(f"You are locked out for {mins_remaining} more minutes")
+                #render_template('login.html', title="Sign In", form=form)
+                return redirect(url_for('login'))
         try:
             server.login(user.email, form.password.data)
             flash("Log in successful!")
@@ -289,11 +307,23 @@ def login():
             session["password"] = form.password.data
             return redirect(url_for('user', username=user.username))
         except smtplib.SMTPAuthenticationError as e:
+            tot_attempts = 3
+            if 'attempts' in session: 
+                session["attempts"] += 1
+            else:
+                session["attempts"] = 1 
             print(f"Error: {e}")
-            flash("You have entered an invalid username or password, try again!")
-            flash("Make sure this account is a valid and registered gmail account.")
-            flash("Your account may not allow less secure apps or requires two-factor authentication: "
+            flash(f"Attempt number: {session['attempts']}:\n {tot_attempts - session['attempts']} attempt(s) remaining!")
+            if session["attempts"] == 2:
+                flash("You have entered an invalid username or password, try again!")
+                flash("Make sure this account is a valid and registered gmail account.")
+                flash("Your account may not allow less secure apps or requires two-factor authentication: "
                       "https://myaccount.google.com/u/1/lesssecureapps?pli=1&pageId=none")
+            if session["attempts"] == 3:
+                time_locked = datetime.now()
+                flash(f"You are locked out as of: {time_locked.strftime('%H:%M:%S')} for {tot_locked_mins} minutes")
+                session["locked_time"] = time_locked
+
             return render_template("login.html", title="Sign In", form=form)
     else:
         return render_template("login.html", title='Sign In', form=form)
