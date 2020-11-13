@@ -11,82 +11,14 @@
     {% endwith %}
 <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
 <link rel="stylesheet" type="text/css" href="../static/main.css">
-<div class="container">
-<div class="row">
+
 	<!-- BEGIN INBOX -->
-	<div class="col-md-12">
-		<div class="grid email">
-			<div class="grid-body">
-				<div class="row">
+<form method = "post" action = "#">
+	<input type = "submit" name = "button" value = "SEECMail">
+	<br>
+	<input type = "submit" name = "button" value = "Notes">
 
+</form>
 
-					<!-- BEGIN INBOX MENU -->
-
-					<!-- END INBOX MENU -->
-
-					<!-- BEGIN INBOX CONTENT -->
-
-
-						<!-- <ul class="pagination">
-							<li class="disabled"><a href="#">«</a></li>
-							<li class="active"><a href="#">1</a></li>
-							<li><a href="#">2</a></li>
-							<li><a href="#">3</a></li>
-							<li><a href="#">4</a></li>
-							<li><a href="#">5</a></li>
-							<li><a href="#">»</a></li>
-                        </ul>						-->
-					</div>
-					<!-- END INBOX CONTENT -->
-
-					<!-- BEGIN COMPOSE MESSAGE -->
-<!--					<div class="modal fade" id="compose-modal" tabindex="-1" role="dialog" aria-hidden="true">
-						<div class="modal-wrapper">
-							<div class="modal-dialog">
-								<div class="modal-content">
-									<div class="modal-header bg-blue">
-										<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-										<h4 class="modal-title"><i class="fa fa-envelope"></i> Compose New Message</h4>
-									</div>
-									<form action="#" method="post">
-										<div class="modal-body">
-											<div class="form-group">
-												<input name="to" type="email" class="form-control" placeholder="To">
-											</div>
-											<div class="form-group">
-												<input name="cc" type="email" class="form-control" placeholder="Cc">
-											</div>
-											<div class="form-group">
-												<input name="bcc" type="email" class="form-control" placeholder="Bcc">
-											</div>
-											<div class="form-group">
-												<input name="subject" type="email" class="form-control" placeholder="Subject">
-											</div>
-											<div class="form-group">
-												<textarea name="message" id="email_message" class="form-control" placeholder="Message" style="height: 120px;"></textarea>
-											</div>
-											<div class="form-group">														<input type="file" name="attachment">
-											</div>
-										</div>
-										<div class="modal-footer">
-											<button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> Discard</button>
-											<button type="submit" class="btn btn-primary pull-right"><i class="fa fa-envelope"></i> Send Message</button>
-										</div>
-									</form>
-								</div>
-							</div>
-						</div>
-					</div>
-                    <!-- END COMPOSE MESSAGE -->
-				</div>
-			</div>
-		</div>
-	</div>
-	<a href = "user.html">SEECMail</a>
-					<br>
-					<br>
-					<a href = "mstrNotes.html">Notes</a>
 	<!-- END INBOX -->
-</div>
-</div>
 {% endblock %}
